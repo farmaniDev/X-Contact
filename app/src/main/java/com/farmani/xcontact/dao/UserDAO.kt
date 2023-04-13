@@ -9,7 +9,7 @@ interface UserDAO {
     fun getAll(): List<UserEntity>
 
     @Query("select * from users where id = :id")
-    fun getUser(id: Int)
+    fun getUser(id: Int) : UserEntity
 
     @Insert
     fun insert(user: UserEntity)

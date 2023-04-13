@@ -1,24 +1,34 @@
 package com.farmani.xcontact
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
+import android.view.Menu
+import android.view.MenuItem
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuItem
 import com.farmani.xcontact.databinding.ActivityMainBinding
+import com.farmani.xcontact.entity.UserEntity
+import com.farmani.xcontact.utilities.SaveAvatar
+
+//import com.farmani.xcontact.utilities.SaveAvatar
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    lateinit var db: AppDatabase
+    private val context = this
+    val requestCode = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        db = AppDatabase.getDB(context)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -29,9 +39,33 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
 
         binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+//            val user1 = UserEntity("Mohammad Javad", "test@gmail.com", "09111234567", null)
+//            db.user().insert(user1)
+            advancedAddUser()
         }
+
+    }
+
+
+    var resultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                    val data = result.data
+                val avatarUri = data!!.data!!
+                val saveAvatar = SaveAvatar.saveAvatar(context, avatarUri)
+
+                addUser("MJ Farmani", null, "09396838975", saveAvatar)
+            }
+        }
+
+    private fun advancedAddUser() {
+        val picker = Intent(Intent.ACTION_GET_CONTENT)
+        picker.type = "image/*"
+        resultLauncher.launch(picker)
+    }
+
+    private fun addUser(name: String, email: String?, phone: String, avatar: String?) {
+        db.user().insert(UserEntity(name, email, phone, avatar))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

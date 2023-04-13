@@ -12,7 +12,9 @@ class UserEntity(
     @ColumnInfo(name = "user_email")
     var email: String?,
     @ColumnInfo(name = "user_number")
-    var number: String
+    var number: String,
+    @ColumnInfo(name = "user_avatar")
+    var avatar: String? = null
 ) {
-    constructor(name: String, email: String?, number: String) : this(0, name, email, number)
+    constructor(name: String, email: String?, number: String, avatar: String?) : this(0, name, email, number, avatar)
 }
