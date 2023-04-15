@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.farmani.xcontact.dao.UserDAO
-import com.farmani.xcontact.entity.UserEntity
+import com.farmani.xcontact.dao.ContactDAO
+import com.farmani.xcontact.entity.ContactEntity
 
-@Database(entities = [UserEntity::class], version = 1)
+@Database(entities = [ContactEntity::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun user(): UserDAO
+    abstract fun user(): ContactDAO
 
     companion object {
         private var instance: AppDatabase? = null

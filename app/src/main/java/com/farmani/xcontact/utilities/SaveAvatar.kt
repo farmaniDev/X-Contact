@@ -7,7 +7,9 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.*
 
+
 object SaveAvatar {
+    @Synchronized
     fun saveAvatar(context: Context, data: Uri): String? {
         try {
             val avatarName = UUID.randomUUID().toString() + "." + uriToExtension(context, data)

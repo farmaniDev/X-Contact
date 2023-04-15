@@ -13,7 +13,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.farmani.xcontact.databinding.ActivityMainBinding
-import com.farmani.xcontact.entity.UserEntity
+import com.farmani.xcontact.entity.ContactEntity
 import com.farmani.xcontact.utilities.SaveAvatar
 
 //import com.farmani.xcontact.utilities.SaveAvatar
@@ -24,7 +24,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     lateinit var db: AppDatabase
     private val context = this
-    val requestCode = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,33 +38,17 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
 
         binding.fab.setOnClickListener { view ->
-//            val user1 = UserEntity("Mohammad Javad", "test@gmail.com", "09111234567", null)
-//            db.user().insert(user1)
-            advancedAddUser()
+            openAddEdit()
         }
 
     }
 
 
-    var resultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                    val data = result.data
-                val avatarUri = data!!.data!!
-                val saveAvatar = SaveAvatar.saveAvatar(context, avatarUri)
-
-                addUser("MJ Farmani", null, "09396838975", saveAvatar)
-            }
-        }
-
-    private fun advancedAddUser() {
-        val picker = Intent(Intent.ACTION_GET_CONTENT)
-        picker.type = "image/*"
-        resultLauncher.launch(picker)
-    }
-
-    private fun addUser(name: String, email: String?, phone: String, avatar: String?) {
-        db.user().insert(UserEntity(name, email, phone, avatar))
+    private fun openAddEdit(id: Int = 0) {
+        val open = Intent(context, AddEditActivity::class.java)
+        if (id != 0)
+            open.putExtra("id", id)
+        startActivity(open)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
