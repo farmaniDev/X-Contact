@@ -7,15 +7,17 @@ import android.os.Bundle
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import com.farmani.xcontact.databinding.ActivityAddEditBinding
 import com.farmani.xcontact.entity.ContactEntity
-import com.farmani.xcontact.utilities.SaveAvatar
+import com.farmani.xcontact.utilities.AvatarUtil
 
 class AddEditActivity : AppCompatActivity() {
     var MODE_ADD = 1
     var MODE_EDIT = 2
     private var mode = MODE_ADD
     lateinit var db: AppDatabase
+    private lateinit var editContact: ContactEntity
     val context = this
     private var avatarUri: Uri? = null
     private var id = 0
@@ -28,13 +30,14 @@ class AddEditActivity : AppCompatActivity() {
         setContentView(view)
 
         db = AppDatabase.getDB(context)
-        if (intent.getIntExtra("id", 0) != 0)
+        val id = intent.getIntExtra("id", 0)
+        if (id == 0)
             mode = MODE_ADD
         else {
             mode = MODE_EDIT
-            id = intent.getIntExtra("id", 0)
+            this.id = intent.getIntExtra("id", 0)
+            editContact = db.contact().getContact(id)
         }
-        mode = intent.getIntExtra("mode", MODE_ADD)
 
         init()
         listener()
@@ -50,7 +53,11 @@ class AddEditActivity : AppCompatActivity() {
                 val number = binding.etContactNum.text.toString()
                 val avatar = saveAvatar()
 
-                addUser(name, email, number, avatar)
+                if (mode == MODE_ADD)
+                    addContact(name, email, number, avatar)
+
+                if (mode == MODE_EDIT)
+                    editContact(editContact.id, name, email, number, avatar)
             }
         }
 
@@ -64,20 +71,30 @@ class AddEditActivity : AppCompatActivity() {
             MODE_ADD -> {
                 binding.ivAvatar.setImageResource(R.drawable.no_image)
                 binding.btnSave.text = getString(R.string.add)
+                title = "Add New Contact"
             }
+
             MODE_EDIT -> {
-                loadAvatar()
                 binding.btnSave.text = getString(R.string.edit)
+                viewInitializer(editContact)
+                title = "Edit ${editContact.name}"
             }
         }
     }
 
-    private fun loadAvatar() {
-
+    private fun loadAvatar(avatar: String?) {
+        if (avatar != null) {
+            val avatarFile = AvatarUtil.loadAvatar(context, avatar)
+            binding.ivAvatar.setImageURI(avatarFile.toUri())
+        }
     }
 
     private fun viewInitializer(contact: ContactEntity) {
+        binding.etContactName.setText(contact.name)
+        binding.etContactEmail.setText(contact.email)
+        binding.etContactNum.setText(contact.number)
 
+        loadAvatar(contact.avatar)
     }
 
     private fun validator(): Boolean {
@@ -100,7 +117,7 @@ class AddEditActivity : AppCompatActivity() {
     private fun saveAvatar(): String? {
         var result: String? = null
         if (avatarUri != null) {
-            result = SaveAvatar.saveAvatar(context, avatarUri!!)
+            result = AvatarUtil.saveAvatar(context, avatarUri!!)
         }
         return result
     }
@@ -111,14 +128,31 @@ class AddEditActivity : AppCompatActivity() {
         resultLauncher.launch(picker)
     }
 
-    private fun addUser(
+    private fun addContact(
         contactName: String,
         email: String?,
         number: String,
         avatar: String? = null
     ) {
         val contact = ContactEntity(contactName, email, number, avatar)
-        db.user().insert(contact)
+        db.contact().insert(contact)
+        finish()
+    }
+
+    private fun editContact(
+        id: Int,
+        contactName: String,
+        email: String?,
+        number: String,
+        avatar: String? = null
+    ) {
+
+        var avatarName = avatar
+        if (avatarName == null || avatarName == "")
+            avatarName = editContact.avatar
+
+        val contact = ContactEntity(id, contactName, email, number, avatarName)
+        db.contact().update(contact)
         finish()
     }
 }

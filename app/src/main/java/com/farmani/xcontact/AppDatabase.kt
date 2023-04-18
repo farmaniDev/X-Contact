@@ -9,7 +9,7 @@ import com.farmani.xcontact.entity.ContactEntity
 
 @Database(entities = [ContactEntity::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun user(): ContactDAO
+    abstract fun contact(): ContactDAO
 
     companion object {
         private var instance: AppDatabase? = null

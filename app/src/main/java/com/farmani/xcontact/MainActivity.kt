@@ -1,20 +1,15 @@
 package com.farmani.xcontact
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.farmani.xcontact.databinding.ActivityMainBinding
-import com.farmani.xcontact.entity.ContactEntity
-import com.farmani.xcontact.utilities.SaveAvatar
 
 //import com.farmani.xcontact.utilities.SaveAvatar
 
@@ -38,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
 
         binding.fab.setOnClickListener { view ->
-            openAddEdit()
+            openAddEdit(1)
         }
 
     }

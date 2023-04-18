@@ -5,10 +5,11 @@ import android.net.Uri
 import android.webkit.MimeTypeMap
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
 
-object SaveAvatar {
+object AvatarUtil {
     @Synchronized
     fun saveAvatar(context: Context, data: Uri): String? {
         try {
@@ -33,5 +34,18 @@ object SaveAvatar {
         val mime = MimeTypeMap.getSingleton()
 
         return mime.getExtensionFromMimeType(contentResolver.getType(data)) ?: ""
+    }
+
+    @Synchronized
+    fun loadAvatar(context: Context, name: String): File {
+        val avatar = File(context.cacheDir, name)
+        if (avatar.exists())
+            return avatar
+
+        val avatarBytes = context.openFileInput(name).readBytes()
+        val fileOut = FileOutputStream(avatar)
+        fileOut.write(avatarBytes)
+
+        return avatar
     }
 }
